@@ -4,9 +4,16 @@
 #include <string>
 #include <vector>
 
+struct ProgramSettings {
+    bool helpRequested;
+    bool versionRequested;
+    std::string inputFile;
+    std::string outputFile;
+    std::string cipherKey;
+    bool encrypt;
+};
+
 bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
-                        bool& helpRequested, bool& versionRequested,
-                        std::string& inputFile, std::string& outputFile,
-                        std::string& cipherKey, bool& encrypt);
+                        ProgramSettings& progsettings);
 
 #endif    // MPAGSCIPHER_PROCESSCOMMANDLINE_HPP
