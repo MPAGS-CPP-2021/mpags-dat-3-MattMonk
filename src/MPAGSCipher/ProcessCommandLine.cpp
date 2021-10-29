@@ -5,7 +5,7 @@
 #include <vector>
 
 bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
-                        ProgramSettings& progsettings)
+                        ProgramSettings& settings)
 {
     // Status flag to indicate whether or not the parsing was successful
     bool processStatus{true};
@@ -16,11 +16,11 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
     for (std::size_t i{1}; i < nCmdLineArgs; ++i) {
         if (cmdLineArgs[i] == "-h" || cmdLineArgs[i] == "--help") {
             // Set the indicator and terminate the loop
-            progsettings.helpRequested = true;
+            settings.helpRequested_ = true;
             break;
         } else if (cmdLineArgs[i] == "--version") {
             // Set the indicator and terminate the loop
-            progsettings.versionRequested = true;
+            settings.versionRequested_ = true;
             break;
         } else if (cmdLineArgs[i] == "-i") {
             // Handle input file option
@@ -33,7 +33,7 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
                 break;
             } else {
                 // Got filename, so assign value and advance past it
-                progsettings.inputFile = cmdLineArgs[i + 1];
+                settings.inputFile_ = cmdLineArgs[i + 1];
                 ++i;
             }
         } else if (cmdLineArgs[i] == "-o") {
@@ -47,7 +47,7 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
                 break;
             } else {
                 // Got filename, so assign value and advance past it
-                progsettings.outputFile = cmdLineArgs[i + 1];
+                settings.outputFile_ = cmdLineArgs[i + 1];
                 ++i;
             }
         } else if (cmdLineArgs[i] == "-k") {
@@ -61,13 +61,13 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
                 break;
             } else {
                 // Got the key, so assign the value and advance past it
-                progsettings.cipherKey = cmdLineArgs[i + 1];
+                settings.cipherKey_ = cmdLineArgs[i + 1];
                 ++i;
             }
         } else if (cmdLineArgs[i] == "--encrypt") {
-            progsettings.encrypt = true;
+            settings.encrypt_ = true;
         } else if (cmdLineArgs[i] == "--decrypt") {
-            progsettings.encrypt = false;
+            settings.encrypt_ = false;
         } else {
             // Have encoutered an unknown flag, output an error message,
             // set the flag to indicate the error and terminate the loop
