@@ -40,7 +40,7 @@ CaesarCipher::CaesarCipher(const std::string& key)
 }
 
 std::string CaesarCipher::applyCipher(const std::string& inputText,
-                    CipherMode cipherMode)
+                    const CipherMode cipherMode) const
 {
     // Create the output string
     std::string outputText;

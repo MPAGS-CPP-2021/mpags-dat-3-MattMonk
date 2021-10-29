@@ -12,7 +12,7 @@ class CaesarCipher {
         explicit CaesarCipher(const std::size_t key);
         explicit CaesarCipher(const std::string& key);
         std::string applyCipher(const std::string& inputText,
-                    CipherMode cipherMode);
+                    const CipherMode cipherMode) const;
     private:
         std::size_t key_{0};
         const std::vector<char> alphabet_{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
