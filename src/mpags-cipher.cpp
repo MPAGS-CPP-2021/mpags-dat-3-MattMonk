@@ -1,7 +1,8 @@
 #include "ProcessCommandLine.hpp"
-#include "RunCaesarCipher.hpp"
+//#include "RunCaesarCipher.hpp"
 #include "TransformChar.hpp"
 #include "CaesarCipher.hpp"
+#include "CipherMode.hpp"
 
 #include <cctype>
 #include <fstream>
@@ -15,7 +16,8 @@ int main(int argc, char* argv[])
     const std::vector<std::string> cmdLineArgs{argv, argv + argc};
 
     // Options that might be set by the command-line arguments
-    ProgramSettings settings {false, false, "", "", "", true};
+    CipherMode cipherMode{CipherMode::Encrypt};
+    ProgramSettings settings {false, false, "", "", "", cipherMode};
 
     // Process command line arguments
     const bool cmdLineStatus{
@@ -89,10 +91,9 @@ int main(int argc, char* argv[])
     // We have the key as a string, but the Caesar cipher needs an unsigned long, so we first need to convert it
     // We default to having a key of 0, i.e. no encryption, if no key was provided on the command line
     CaesarCipher caesarCipher{settings.cipherKey_};
-    std::size_t caesarKey{caesarCipher.key_};
     
     // Run the Caesar cipher (using the specified key and encrypt/decrypt flag) on the input text
-    std::string outputText{runCaesarCipher(inputText, caesarKey, settings.encrypt_)};
+    std::string outputText{caesarCipher.applyCipher(inputText, settings.cipherMode)};
 
     // Output the encrypted/decrypted text to stdout/file
     if (!settings.outputFile_.empty()) {

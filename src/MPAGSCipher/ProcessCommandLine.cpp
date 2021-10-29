@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "CipherMode.hpp"
 
 bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
                         ProgramSettings& settings)
@@ -65,9 +66,9 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
                 ++i;
             }
         } else if (cmdLineArgs[i] == "--encrypt") {
-            settings.encrypt_ = true;
+            settings.cipherMode = CipherMode::Encrypt;
         } else if (cmdLineArgs[i] == "--decrypt") {
-            settings.encrypt_ = false;
+            settings.cipherMode = CipherMode::Decrypt;
         } else {
             // Have encoutered an unknown flag, output an error message,
             // set the flag to indicate the error and terminate the loop

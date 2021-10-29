@@ -1,4 +1,5 @@
 #include "CaesarCipher.hpp"
+#include "CipherMode.hpp"
 
 #include <string>
 #include <iostream>
@@ -13,7 +14,6 @@ CaesarCipher::CaesarCipher(const std::size_t key)
 CaesarCipher::CaesarCipher(const std::string& key)
     : key_{0}
 {
-    bool okay{true};
     if (!key.empty()) {
         // Before doing the conversion we should check that the string contains a
         // valid positive integer.
@@ -32,9 +32,49 @@ CaesarCipher::CaesarCipher(const std::string& key)
                     << "[error] cipher key must be an unsigned long integer for Caesar cipher,\n"
                     << "        the supplied key (" << key
                     << ") could not be successfully converted" << std::endl;
-                okay = false;
+                return;
             }
         }
-        if(okay) key_ = std::stoul(key);
+        key_ = std::stoul(key);
     }
+}
+
+std::string CaesarCipher::applyCipher(const std::string& inputText,
+                    CipherMode cipherMode)
+{
+    // Create the output string
+    std::string outputText;
+
+    const std::size_t alphabetSize{alphabet_.size()};
+
+    const std::size_t truncatedKey{key_ % alphabetSize};
+
+    // Loop over the input text
+    char processedChar{'x'};
+    for (const auto& origChar : inputText) {
+        // For each character in the input text, find the corresponding position in
+        // the alphabet by using an indexed loop over the alphabet container
+        for (size_t i{0}; i < alphabetSize; ++i) {
+            if (origChar == alphabet_[i]) {
+                // Apply the appropriate shift (depending on whether we're encrypting
+                // or decrypting) and determine the new character
+                // Can then break out of the loop over the alphabet
+                switch(cipherMode) {
+                    case CipherMode::Encrypt:
+                        processedChar = alphabet_[(i + truncatedKey) % alphabetSize];
+                        break;
+                    case CipherMode::Decrypt:
+                        processedChar = alphabet_[(i + alphabetSize - truncatedKey) %
+                                             alphabetSize];
+                        break;
+                }
+                break;
+            }
+        }
+
+        // Add the new character to the output text
+        outputText += processedChar;
+    }
+
+    return outputText;
 }
