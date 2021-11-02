@@ -23,3 +23,8 @@ add_test(NAME test-transformchar COMMAND testTransformChar)
 add_executable(testProcessCommandLine testProcessCommandLine.cpp)
 target_link_libraries(testProcessCommandLine MPAGSCipher Catch)
 add_test(NAME test-processcommandline COMMAND testProcessCommandLine)
+
+# Test CaesarCipher
+add_executable(testCaesarCipher testCaesarCipher.cpp)
+target_link_libraries(testCaesarCipher MPAGSCipher Catch)
+add_test(NAME test-caesarCipher COMMAND testCaesarCipher)
