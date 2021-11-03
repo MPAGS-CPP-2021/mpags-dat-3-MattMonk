@@ -7,6 +7,7 @@
 #include "CipherMode.hpp"
 #include "CaesarCipher.hpp"
 #include "ProcessCommandLine.hpp"
+#include "TransformChar.hpp"
 
 //A bit tricky to test. Really, I'd like to test separately
 //the constructor that converts string->size_t but because
@@ -23,52 +24,68 @@ TEST_CASE("Apply the cipher with invalid keys") {
     ProgramSettings settings1 {false, false, "", "", "one", cipherMode};
     CaesarCipher caesarCipher{settings1.cipherKey_};
     ProgramSettings settings2 {false, false, "", "", "-1", cipherMode};
-    CaesarCipher caesarCipher{settings2.cipherKey_};
+    CaesarCipher caesarCipher2{settings2.cipherKey_};
 
-    std::string outText1 {caesarCipher.applyCipher("hel& l0o", settings1.cipherMode)};
+    const std::string inText1 {"hel& l0o"};
+    std::string transText1{""};
+    for(const char charcter : inText1) {
+        transText1 += transformChar(charcter);
+    }
+    std::string outText1 {caesarCipher.applyCipher(transText1, settings1.cipherMode)};
+    //When an invalid key is provided and applyCipher is used, a message warns the user
+    //and the transliterated text is output. However, the transliterated text is NOT
+    //the output of applyCipher(), that is done before applyCipher() is called and
+    //actually the output of applyCipher is just replace the transliterated string
+    //characters with 'x's because that is the place-holder character that is overwritten
+    //in the loop, or in this case not over-written because an invalid key was supplied.
     REQUIRE(outText1 == "HELLZEROO");
-    std::string outText2 {caesarCipher.applyCipher("hel& l0o", settings2.cipherMode)};
+    std::string outText2 {caesarCipher2.applyCipher(transText1, settings2.cipherMode)};
     REQUIRE(outText2 == "HELLZEROO");
 }
 
 TEST_CASE("Apply the cipher with keys > 25") {
+    const std::string inText1 {"hel& l0o"};
+    std::string transText1{""};
+    for(const char charcter : inText1) {
+        transText1 += transformChar(charcter);
+    }
     CipherMode cipherMode {CipherMode::Encrypt};
     ProgramSettings settings1 {false, false, "", "", "40", cipherMode};
     CaesarCipher caesarCipher{settings1.cipherKey_};
-    std::string inText1 {"hel& l0o"};
-    std::string outText1 {caesarCipher.applyCipher(inText1, settings1.cipherMode)};
+    std::string outText1 {caesarCipher.applyCipher(transText1, settings1.cipherMode)};
     REQUIRE(outText1 == "VSZZNSFCC");
 
-    CipherMode cipherMode2 {CipherMode::Decrypt};
-    ProgramSettings settings2 {false, false, "", "", "40", cipherMode2};
-    CaesarCipher caesarCipher2{settings1.cipherKey_};
+    CaesarCipher caesarCipher2{"40"};
     std::string inText2 {"VSZZNSFCC"};
-    std::string outText2 {caesarCipher2.applyCipher(inText2, settings2.cipherMode)};
-    REQUIRE(outText2 == "hel& l0o");
+    std::string outText2 {caesarCipher2.applyCipher(inText2, CipherMode::Decrypt)};
+    REQUIRE(outText2 == "HELLZEROO");
 
     REQUIRE(outText1 == inText2);
-    REQUIRE(outText2 == inText1);
 }
 
 TEST_CASE("Apply the cipher") {
-    std::string ascii {"! \" # $ % & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \\ ] ^ _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~"};
-    for(std::size_t i=0; i<26; i++) {
+    const std::string ascii {"! \" # $ % & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \\ ] ^ _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~"};
+    std::string transAscii{""};
+    for(const char charcter : ascii) {
+        transAscii += transformChar(charcter);
+    }
+    for(std::size_t i{0}; i<26; i++) {
         CaesarCipher caesarCipher{i};
-        std::string out1 {caesarCipher.applyCipher(ascii, CipherMode::Encrypt)};
-        std::string out2 {caesarCipher.applyCipher(ascii, CipherMode::Decrypt)};
+        std::string out1 {caesarCipher.applyCipher(transAscii, CipherMode::Encrypt)};
+        std::string out2 {caesarCipher.applyCipher(transAscii, CipherMode::Decrypt)};
 
         std::string out3 {caesarCipher.applyCipher(out1, CipherMode::Decrypt)};
         std::string out4 {caesarCipher.applyCipher(out2, CipherMode::Encrypt)};
 
-        REQUIRE(out1==out3);
-        REQUIRE(out2==out4);
+        REQUIRE(out3==transAscii);
+        REQUIRE(out4==transAscii);
     }
-    //And a specific key example
+    //And a specific key example, already tested forwards-backwards above
     CaesarCipher caesarCipher{5};
-    std::string out5 {caesarCipher.applyCipher(ascii, CipherMode::Encrypt)};
-    REQUIRE(out5=="FGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDE");
+    std::string out5 {caesarCipher.applyCipher(transAscii, CipherMode::Encrypt)};
+    REQUIRE(out5=="EJWTTSJYBTYMWJJKTZWKNAJXNCXJAJSJNLMYSNSJFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDE");
 
     CaesarCipher caesarCipher2{5};
-    std::string out6 {caesarCipher2.applyCipher(out5, CipherMode::Decrypt)};
-    REQUIRE(out6=="ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    std::string out6 {caesarCipher2.applyCipher(transAscii, CipherMode::Decrypt)};
+    REQUIRE(out6=="UZMJJIZORJOCMZZAJPMADQZNDSNZQZIZDBCOIDIZVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTU");
 }
