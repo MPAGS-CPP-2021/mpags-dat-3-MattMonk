@@ -32,12 +32,6 @@ TEST_CASE("Apply the cipher with invalid keys") {
         transText1 += transformChar(charcter);
     }
     std::string outText1 {caesarCipher.applyCipher(transText1, settings1.cipherMode)};
-    //When an invalid key is provided and applyCipher is used, a message warns the user
-    //and the transliterated text is output. However, the transliterated text is NOT
-    //the output of applyCipher(), that is done before applyCipher() is called and
-    //actually the output of applyCipher is just replace the transliterated string
-    //characters with 'x's because that is the place-holder character that is overwritten
-    //in the loop, or in this case not over-written because an invalid key was supplied.
     REQUIRE(outText1 == "HELLZEROO");
     std::string outText2 {caesarCipher2.applyCipher(transText1, settings2.cipherMode)};
     REQUIRE(outText2 == "HELLZEROO");
