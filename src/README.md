@@ -90,23 +90,51 @@ At present only the Caesar cipher is supported.
 The result of applying the cipher will then be written to stdout or to the
 file supplied with the `-o` option.
 
+## Testing `mpags-cipher`
+
+Unit tests have now been written that allow for the automated testing of
+this program, implemented with Catch2.
+
+To perform testing, build as usual (`cd build`, `cmake ../src` then `make`)
+and then use
+```bash
+make test
+```
+This will give a brief overview of how many tests were run and how many passed/failed.
+For a more comprehensive overview of the tests, instead run
+```bash
+ctest -VV
+```
+which will provide more detail about the tests run (especially those that fail, if any).
+
 ## Source code layout
+
 ```
 .
-├── README.md                       Top-level README, describes layout of the repository
+├── README.md                         Top-level README, describes layout of the repository
 ├── build
 └── src
-    ├── CMakeLists.txt              CMake build script
-    ├── LICENSE                     License file, in our case MIT
-    ├── MPAGSCipher                 Subdirectory for MPAGSCipher library code
-    │   ├── ProcessCommandLine.cpp
-    │   ├── ProcessCommandLine.hpp
-    │   ├── RunCaesarCipher.cpp
-    │   ├── RunCaesarCipher.hpp
-    │   ├── TransformChar.cpp
-    │   └── TransformChar.hpp
-    ├── README.md                   This file, describes the project
-    └── mpags-cipher.cpp            Main program C++ source file
+    ├── CMakeLists.txt                CMake build script
+    ├── LICENSE                       License file, in our case MIT
+    ├── MPAGSCipher                   Subdirectory for MPAGSCipher library code
+    │   ├── CaesarCipher.cpp
+    │   ├── CaesarCipher.hpp
+    │   ├── CipherMode.hpp
+    │   ├── CMakeLists.txt
+    │   ├── ProcessCommandLine.cpp
+    │   ├── ProcessCommandLine.hpp
+    │   ├── TransformChar.cpp
+    │   └── TransformChar.hpp
+    ├── mpags-cipher.cpp               Main program C++ source file
+    ├── README.md                      This file, describes the project
+    └── Testing                        Directory containing unit tests for each component
+        ├── catch.hpp
+        ├── CMakeLists.txt             CMake file specifically for the unit tests to build from
+        ├── testCaesarCipher.cpp
+        ├── testCatch.cpp
+        ├── testHello.cpp
+        ├── testProcessCommandLine.cpp
+        └── testTransformChar.cpp
 ```
 
 ## Copying
